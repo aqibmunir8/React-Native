@@ -1,12 +1,17 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Link } from "expo-router";
 
+import ThemedView from "../components/ThemedView";
+import ThemedText from "../components/ThemedText";
+
 const About = () => {
   return (
-    <View style={styles.container}>
-      <Text style={[styles.title]}>About Page</Text>
-      <Link href="/" style={styles.link}>Back to Home page</Link>
-    </View>
+    <ThemedView style={styles.container}>
+      <ThemedText style={[styles.title]}>About Page</ThemedText>
+      <Link href="/" style={styles.link}>
+        <ThemedText>Back to Home page</ThemedText>
+      </Link>
+    </ThemedView>
   );
 };
 
