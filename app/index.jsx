@@ -3,13 +3,17 @@ import Logo from "../assets/img/logo_light.png";
 import { Link } from "expo-router";
 import ThemedView from "../components/ThemedView";
 import ThemedLogo from "../components/ThemedLogo";
+import Spacer from "../components/Spacer";
 
 const Home = () => {
   return (
     <ThemedView style={styles.container}>
       <ThemedLogo />
       <Text style={[styles.title, { marginTop: 20 }]}>The Number 1</Text>
-      <Text style={{ margin: 10, marginBottom: 30 }}>Reading List App</Text>
+      <Spacer height={10} />
+      <Text>Reading List App</Text>
+      <Spacer height={5}/>
+
       <Link href="/about" style={styles.link}>
         About Page
       </Link>
