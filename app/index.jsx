@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, Image } from "react-native";
-import Logo from "../assets/img/logo_light.png";
+import { StyleSheet } from "react-native";
+
 import { Link } from "expo-router";
 import ThemedView from "../components/ThemedView";
 import ThemedLogo from "../components/ThemedLogo";
@@ -18,11 +18,11 @@ const Home = () => {
       <ThemedText>Reading List App</ThemedText>
       <Spacer height={5} />
 
-      <Link href="/about" style={styles.link}>
-        <ThemedText>About Page</ThemedText>
+      <Link href="/login" style={styles.link}>
+        <ThemedText>Login Page</ThemedText>
       </Link>
-      <Link href="/about" style={styles.link}>
-        <ThemedText>Contact Page</ThemedText>
+      <Link href="/register" style={styles.link}>
+        <ThemedText>register Page</ThemedText>
       </Link>
     </ThemedView>
   );
