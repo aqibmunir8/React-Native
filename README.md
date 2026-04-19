@@ -23,21 +23,35 @@ To see the specific code, notes, and screenshots for any lesson, switch to the c
 - [x] **06:** [Themed UI Components](https://github.com/aqibmunir8/React-Native/tree/video-6-Themed-UI-Components)
 - [x] **07:** [Route Groups & Nested Layouts](https://github.com/aqibmunir8/React-Native/tree/video-7-route-groups-and-nested-layouts)
 - [x] **08:** [Pressable Component](https://github.com/aqibmunir8/React-Native/tree/video-8-Pressable-Component)
-- [ ] **09-10:** Tabs Navigation & Tab Bar Icons
+- [ ] **09:** Tabs Navigation
+- [ ] **10:** Tab Bar Icons
 - [ ] **11:** Safe Area View
 
 ### Authentication (Appwrite)
 
-- [ ] **12-13:** Backend Setup & Auth Forms
-- [ ] **14-15:** Auth Context & User Login
-- [ ] **16-17:** Error Handling & Logout
-- [ ] **18-20:** Auth State, Protected Routes, & Indicators
+##### Backend Setup & Auth Forms
+
+- [ ] **12** Backend Setup
+- [ ] **13** Login and Signup Forms
+- [ ] **14** Making an Auth Context
+- [ ] **15** Logging Users In
+- [ ] **16** Showing Error Messages
+- [ ] **17** Logging Users Out
+- [ ] **18** Initial Auth State
+- [ ] **19** Protecting Routes
+- [ ] **20** Activity Indicators
 
 ### Database & Real-time Data
 
-- [ ] **21-22:** Database Setup & Books Context
-- [ ] **23-26:** CRUD Operations & FlatList Integration
-- [ ] **27-29:** Dynamic Routes & Deleting Records
+- [ ] **21** Database Setup
+- [ ] **22:** Books Context
+- [ ] **23** Creating New Records
+- [ ] **24** Fetching Book Records
+- [ ] **25** Using the FlatList Component
+- [ ] **26** Real-Time Data
+- [ ] **27** Dynamic Routes
+- [ ] **28** Fetching Single Records
+- [ ] **29** Deleting Books
 
 ---
 
