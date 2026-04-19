@@ -81,15 +81,3 @@ I am documenting my technical notes for each video using **Notion**. Detailed co
 _Created by [aqibmunir8](https://github.com/aqibmunir8)_
 
 ---
-
-### How to apply this to your Main branch:
-
-1. Make sure you are on your `main` branch: `git checkout main`
-2. Open your `README.md` file and paste the content above.
-3. Save it.
-4. Run:
-   ```bash
-   git add README.md
-   git commit -m "Update Main README with full learning roadmap"
-   git push origin main
-   ```
