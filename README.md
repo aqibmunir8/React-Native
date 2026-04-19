@@ -1,27 +1,3 @@
-# My React Native Learning Journey 📱
-
-This repository contains my progress as I follow a React Native video series. I'm documenting each step using branches.
-
-## 📌 Project Overview
-
-An Expo-based Reading List App (Shelfie) with React Navigation (Expo Router).
-
-## 🚀 How to navigate this Repo
-
-Each video has its own branch. You can switch branches to see the code at that specific stage.
-
-## 📝 Learning Notes
-
-I am keeping track of my learnings here:
-
-- [Link to my Notion Notes] or check the `/notes` folder.
-
-## 🛠️ Tech Stack
-
-- React Native / Expo
-- Expo Router
-- Lucide Icons / Custom Assets
-
 # React Native Learning Journey 📱
 
 This repository tracks my progress through the **Net Ninja React Native** series. I am building "Shelfie," a book-tracking application, while mastering Expo Router, custom theming, and backend integration.
