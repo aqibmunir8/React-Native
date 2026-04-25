@@ -1,30 +1,30 @@
-import { StyleSheet, Text } from "react-native";
-import { Pressable } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
+import { Link } from "expo-router";
 import { Colors } from "../../constants/Colors";
 
-import { Link } from "expo-router";
 import ThemedView from "../../components/ThemedView";
-import Spacer from "../../components/Spacer";
 import ThemedText from "../../components/ThemedText";
+import Spacer from "../../components/Spacer";
 import ThemedButton from "../../components/ThemedButton";
 
 const Login = () => {
-  const handleLogin = () => {
-    console.log("Login form submitted");
+  const handleSubmit = async () => {
+    console.log("login form submitted");
   };
 
   return (
     <ThemedView style={styles.container}>
       <Spacer />
       <ThemedText title={true} style={styles.title}>
-        Login to your Account
+        Login to Your Account
       </ThemedText>
-      <ThemedButton onPress={handleLogin}>
+
+      <ThemedButton onPress={handleSubmit}>
         <Text style={{ color: "#f2f2f2" }}>Login</Text>
       </ThemedButton>
 
       <Spacer height={100} />
-      <Link href="/register">
+      <Link href="/register" replace>
         <ThemedText style={{ textAlign: "center" }}>
           Register instead
         </ThemedText>
@@ -39,20 +39,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    // alignItems: "center",
+    alignItems: "center",
   },
   title: {
     textAlign: "center",
     fontSize: 18,
     marginBottom: 30,
-  },
-  btn: {
-    backgroundColor: Colors.primary, // Constant purple color
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  pressed: {
-    opacity: 0.7, // Visual feedback: button fades slightly when touched - Visual feedback: button becomes fainter when pressed
   },
 });
