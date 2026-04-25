@@ -1,14 +1,32 @@
 import { useColorScheme, View } from "react-native";
 import { Colors } from "../constants/Colors";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const ThemedView = ({ style, ...props }) => {
-  // Removed children from here
+const ThemedView = ({ style, safe = false, ...props }) => {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme] ?? Colors.light;
 
+  if (!safe)
+    return (
+      <View style={[{ backgroundColor: theme.background }, style]} {...props} />
+    );
+
+  const insets = useSafeAreaInsets();
+  console.log(insets);
+
   return (
-    <View style={[{ backgroundColor: theme.background }, style]} {...props} />
-  ); // made this view component -> self-closing. And when we do this, React automatically renders the children in the same way. So we don't have  to manually output them.
+    <View
+      style={[
+        {
+          backgroundColor: theme.background,
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+        },
+        style,
+      ]}
+      {...props}
+    />
+  );
 };
 
 export default ThemedView;
