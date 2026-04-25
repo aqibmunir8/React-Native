@@ -14,12 +14,6 @@ To see the specific code, notes, and screenshots for any lesson, switch to the c
 
 ---
 
-## ✍️ Personal Notes
-
-I am documenting my technical notes for each video using **Notion**. Detailed code snippets and implementation logic can be found in the README of each specific branch. 
-
-_Created by [Personal Notes on Notion](https://titanium-salad-e43.notion.site/0-React-Native-Net-Ninja-by-aqibmunir-33ef154b21bd80608957f8aa4e518777)_
-
 ## 📚 Curriculum Roadmap
 
 ### Native Basics
@@ -67,6 +61,10 @@ _Created by [Personal Notes on Notion](https://titanium-salad-e43.notion.site/0-
 - **Routing:** Expo Router (File-based)
 - **Icons:** Lucide React Native / FontAwesome
 - **Backend:** Appwrite (Planned)
+
+## ✍️ Personal Notes
+
+I am documenting my technical notes for each video using **Notion**. Detailed code snippets and implementation logic can be found in the README of each specific branch.
 
 ---
 
