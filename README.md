@@ -1,74 +1,98 @@
-# React Native Learning Journey 📱
+## 13- Text Inputs & State Management
 
-This repository tracks my progress through the **Net Ninja React Native** series. I am building "Shelfie," a book-tracking application, while mastering Expo Router, custom theming, and backend integration.
+### 1. The TextInput Component
 
-## 🚀 Navigation through this Repo
+React Native provides a native `<TextInput />` for user data entry. By default, it is **completely unstyled**, appearing as an invisible field unless you look closely at the placeholder.
 
-To see the specific code, notes, and screenshots for any lesson, switch to the corresponding branch using the GitHub branch selector.
+- **Placeholder:** `placeholder="Email"` gives the user a hint of what to type.
+- **Keyboard Optimization:** Use `keyboardType="email-address"` to show the `@` symbol immediately, improving UX for login forms.
+- **Security:** For passwords, the `secureTextEntry={true}` prop hides characters (replacing them with dots or stars).
 
-| Section      | Milestone                     | Status                    |
-| :----------- | :---------------------------- | :------------------------ |
-| **Basics**   | Navigation, Theming & Layouts | ✅ Completed (Videos 1-8) |
-| **Auth**     | Appwrite Auth & Context       | ⏳ Upcoming               |
-| **Database** | CRUD Operations & Real-time   | ⏳ Upcoming               |
+### 2. Creating a Reusable "ThemedTextInput"
 
----
+Since inputs are used throughout the app, we extract them into a custom component that automatically respects the user's **Light/Dark mode**.
 
-## 📚 Curriculum Roadmap
+**File:** `./components/ThemedTextInput.jsx`
 
-### Native Basics
+```jsx
+import { TextInput, useColorScheme } from "react-native";
+import { Colors } from "../constants/Colors";
 
-- [x] **01-04:** Introduction, Components, & File-based Navigation
-- [x] **05:** [Light & Dark Modes](https://github.com/aqibmunir8/React-Native/tree/video-5-light-and-dark-theme)
-- [x] **06:** [Themed UI Components](https://github.com/aqibmunir8/React-Native/tree/video-6-Themed-UI-Components)
-- [x] **07:** [Route Groups & Nested Layouts](https://github.com/aqibmunir8/React-Native/tree/video-7-route-groups-and-nested-layouts)
-- [x] **08:** [Pressable Component](https://github.com/aqibmunir8/React-Native/tree/video-8-Pressable-Component)
-- [x] **09:** [Tabs Navigation](https://github.com/aqibmunir8/React-Native/tree/video-9-Tabs-Navigation)
+const ThemedTextInput = ({ style, ...props }) => {
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme] ?? Colors.light;
 
-- [x] **10:** [Tab Bar Icons](https://github.com/aqibmunir8/React-Native/tree/video-10-Tabs-Bar-Icons)
-- [x] **11:** [Safe Area View](https://github.com/aqibmunir8/React-Native/tree/video-11-Safe-Area-View)
+  return (
+    <TextInput
+      style={[
+        {
+          backgroundColor: theme.uiBackground,
+          color: theme.text,
+          padding: 20,
+          borderRadius: 6,
+        },
+        style,
+      ]}
+      placeholderTextColor={theme.iconColor} // Helps visibility in both themes
+      {...props}
+    />
+  );
+};
 
-### Authentication (Appwrite)
-
-##### Backend Setup & Auth Forms
-
-- [ ] **12** Backend Setup
-- [ ] **13** Login and Signup Forms
-- [ ] **14** Making an Auth Context
-- [ ] **15** Logging Users In
-- [ ] **16** Showing Error Messages
-- [ ] **17** Logging Users Out
-- [ ] **18** Initial Auth State
-- [ ] **19** Protecting Routes
-- [ ] **20** Activity Indicators
-
-### Database & Real-time Data
-
-- [ ] **21** Database Setup
-- [ ] **22:** Books Context
-- [ ] **23** Creating New Records
-- [ ] **24** Fetching Book Records
-- [ ] **25** Using the FlatList Component
-- [ ] **26** Real-Time Data
-- [ ] **27** Dynamic Routes
-- [ ] **28** Fetching Single Records
-- [ ] **29** Deleting Books
+export default ThemedTextInput;
+```
 
 ---
 
-## 🛠️ Built With
+### 3. State Management with `useState`
 
-- **Framework:** [Expo](https://expo.dev/) / React Native
-- **Routing:** Expo Router (File-based)
-- **Icons:** Lucide React Native / FontAwesome
-- **Backend:** Appwrite (Planned)
+To capture what the user is typing, we use **Two-Way Data Binding**. This means the input shows the state value, and the state updates whenever the text changes.
 
-## ✍️ Personal Notes
+- **onChangeText:** A prop that automatically receives the current string from the input.
+- **Value:** Points back to the state variable, allowing the code to reset the form easily.
 
-I am documenting my technical notes for each video using **Notion**. Detailed code snippets and implementation logic can be found in the README of each specific branch.
+```jsx
+const [email, setEmail] = useState("");
+
+<ThemedTextInput
+  placeholder="Email"
+  value={email}
+  onChangeText={setEmail} // Automatically passes the text to the setter
+  keyboardType="email-address"
+/>;
+```
 
 ---
 
-_Created by [aqibmunir8](https://github.com/aqibmunir8)_
+### 4. Improving UX: Dismissing the Keyboard
 
----
+On mobile, the keyboard often stays open even if you click outside the input. To fix this, we wrap our screen in `TouchableWithoutFeedback`.
+
+- **The logic:** If the user taps anywhere on the screen that isn't a button or input, we trigger `Keyboard.dismiss()`.
+
+**Implementation in `login.jsx`:**
+
+```jsx
+import { TouchableWithoutFeedback, Keyboard } from "react-native";
+
+return (
+  <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <ThemedView style={styles.container}>
+      {/* Your form components here */}
+    </ThemedView>
+  </TouchableWithoutFeedback>
+);
+```
+
+### Key Takeaways
+
+- **Controlled Components:** By linking the `value` to state and `onChangeText` to a setter, you have absolute control over the input data.
+- **Visual Polish:** Adding `padding` and `borderRadius` to inputs makes them look like modern mobile components rather than web-style boxes.
+- **Interaction Flow:** Small touches like `Keyboard.dismiss` and `secureTextEntry` are what separate professional apps from amateur ones.
+
+| **Feature**        | **Implementation**             | **Description**                                         |
+| ------------------ | ------------------------------ | ------------------------------------------------------- |
+| **Email Field**    | `keyboardType="email-address"` | Shows `@` and `.com` shortcuts on the keyboard.         |
+| **Password Field** | `secureTextEntry={true}`       | Hides sensitive characters as the user types.           |
+| **Dismiss Keypad** | `Keyboard.dismiss`             | Programmatically closes the keyboard on tap-away.       |
+| **Submit Logic**   | `onPress` on a Button          | Collects local state (`email`, `password`) for the API. |
