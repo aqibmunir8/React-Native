@@ -6,11 +6,11 @@ This repository tracks my progress through the **Net Ninja React Native** series
 
 To see the specific code, notes, and screenshots for any lesson, switch to the corresponding branch using the GitHub branch selector.
 
-| Section      | Milestone                     | Status                    |
-| :----------- | :---------------------------- | :------------------------ |
-| **Basics**   | Navigation, Theming & Layouts | ✅ Completed (Videos 1-8) |
-| **Auth**     | Appwrite Auth & Context       | ⏳ Upcoming               |
-| **Database** | CRUD Operations & Real-time   | ⏳ Upcoming               |
+| Section      | Milestone                     | Status       |
+| :----------- | :---------------------------- | :----------- |
+| **Basics**   | Navigation, Theming & Layouts | ✅ Completed |
+| **Auth**     | Appwrite Auth & Context       | ⏳ Progress  |
+| **Database** | CRUD Operations & Real-time   | ⏳ Upcoming  |
 
 ---
 
@@ -32,8 +32,10 @@ To see the specific code, notes, and screenshots for any lesson, switch to the c
 
 ##### Backend Setup & Auth Forms
 
-- [ ] **12** Backend Setup
-- [ ] **13** Login and Signup Forms
+- [x] **12** [Backend Setup](https://github.com/aqibmunir8/React-Native/tree/video-12-Backend-setup-with-AppWrite)
+
+- [x] **13** [Login and Signup Forms](https://github.com/aqibmunir8/React-Native/tree/video-13-Login-and-Signup-Forms)
+
 - [ ] **14** Making an Auth Context
 - [ ] **15** Logging Users In
 - [ ] **16** Showing Error Messages
