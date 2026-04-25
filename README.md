@@ -1,73 +1,88 @@
-# React Native Learning Journey 📱
+## 9 - Tab Navigation & Dashboard Layout
 
-This repository tracks my progress through the **Net Ninja React Native** series. I am building "Shelfie," a book-tracking application, while mastering Expo Router, custom theming, and backend integration.
-
-## 🚀 Navigation through this Repo
-
-To see the specific code, notes, and screenshots for any lesson, switch to the corresponding branch using the GitHub branch selector.
-
-| Section      | Milestone                     | Status                    |
-| :----------- | :---------------------------- | :------------------------ |
-| **Basics**   | Navigation, Theming & Layouts | ✅ Completed (Videos 1-8) |
-| **Auth**     | Appwrite Auth & Context       | ⏳ Upcoming               |
-| **Database** | CRUD Operations & Real-time   | ⏳ Upcoming               |
+In this section, we move beyond stack-based navigation to implement **Tab Navigation**. This is the standard "bottom bar" navigation seen in most mobile apps, allowing users to switch between top-level views like a Profile, a Feed, or a Creation screen.
 
 ---
 
-## 📚 Curriculum Roadmap
+### 1. Introduction to Tab Navigation
 
-### Native Basics
+While **Stack navigation** handles screens that sit on top of each other (like a deck of cards), **Tabs** provide a persistent bottom-navigation bar. This allows users to switch between the primary sections of an app quickly without losing their place in each tab's individual state.
 
-- [x] **01-04:** Introduction, Components, & File-based Navigation
-- [x] **05:** [Light & Dark Modes](https://github.com/aqibmunir8/React-Native/tree/video-5-light-and-dark-theme)
-- [x] **06:** [Themed UI Components](https://github.com/aqibmunir8/React-Native/tree/video-6-Themed-UI-Components)
-- [x] **07:** [Route Groups & Nested Layouts](https://github.com/aqibmunir8/React-Native/tree/video-7-route-groups-and-nested-layouts)
-- [x] **08:** [Pressable Component](https://github.com/aqibmunir8/React-Native/tree/video-8-Pressable-Component)
-- [ ] **09:** Tabs Navigation
-- [ ] **10:** Tab Bar Icons
-- [ ] **11:** Safe Area View
+### 2. Creating a Dashboard Route Group
 
-### Authentication (Appwrite)
+To organize pages visible only to logged-in users, we use a **Route Group** (a folder name wrapped in parentheses). This keeps the project structure clean without affecting the URL path.
 
-##### Backend Setup & Auth Forms
+Just like our `(auth)` group, we wrap the folder name in parentheses so that the folder name itself is omitted from the URL. This allows us to link directly to the filename or component name.
 
-- [ ] **12** Backend Setup
-- [ ] **13** Login and Signup Forms
-- [ ] **14** Making an Auth Context
-- [ ] **15** Logging Users In
-- [ ] **16** Showing Error Messages
-- [ ] **17** Logging Users Out
-- [ ] **18** Initial Auth State
-- [ ] **19** Protecting Routes
-- [ ] **20** Activity Indicators
-
-### Database & Real-time Data
-
-- [ ] **21** Database Setup
-- [ ] **22:** Books Context
-- [ ] **23** Creating New Records
-- [ ] **24** Fetching Book Records
-- [ ] **25** Using the FlatList Component
-- [ ] **26** Real-Time Data
-- [ ] **27** Dynamic Routes
-- [ ] **28** Fetching Single Records
-- [ ] **29** Deleting Books
+- **Folder Structure:** `/app/(dashboard)/`
+- **New Pages Created:**
+  - `profile.jsx`: User details and logout.
+  - `books.jsx`: List of all books.
+  - `create.jsx`: Form to add new books.
 
 ---
 
-## 🛠️ Built With
+### 3. Setting Up the Tabs Layout
 
-- **Framework:** [Expo](https://expo.dev/) / React Native
-- **Routing:** Expo Router (File-based)
-- **Icons:** Lucide React Native / FontAwesome
-- **Backend:** Appwrite (Planned)
+To implement tab navigation, create a `_layout.jsx` inside the `(dashboard)` folder. This file defines how the navigation bar looks and behaves.
 
-## ✍️ Personal Notes
+**File:** `./app/(dashboard)/_layout.jsx`
 
-I am documenting my technical notes for each video using **Notion**. Detailed code snippets and implementation logic can be found in the README of each specific branch.
+```javascript
+import { Tabs } from "expo-router";
+import { useColorScheme } from "react-native";
+import { Colors } from "../../constants/Colors";
+
+export default function DashboardLayout() {
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme] ?? Colors.light;
+
+  return (
+    <Tabs
+      screenOptions={{
+        headerShown: false, // Hide the top header bar
+        tabBarStyle: {
+          backgroundColor: theme.navBackground,
+          height: 90,
+          paddingTop: 10,
+        },
+        tabBarActiveTintColor: theme.iconColorFocused,
+        tabBarInactiveTintColor: theme.iconColor,
+      }}
+    >
+      <Tabs.Screen name="books" options={{ title: "Books" }} />
+      <Tabs.Screen name="create" options={{ title: "Create" }} />
+      <Tabs.Screen name="profile" options={{ title: "Profile" }} />
+    </Tabs>
+  );
+}
+```
 
 ---
 
-_Created by [aqibmunir8](https://github.com/aqibmunir8)_
+### 4. Key Tab Components & Props
+
+| Property                    | Description                                                                             |
+| :-------------------------- | :-------------------------------------------------------------------------------------- |
+| **`screenOptions`**         | Global settings applied to every tab in this layout (e.g., hiding headers).             |
+| **`tabBarActiveTintColor`** | The color of the label and icon when the tab is currently selected.                     |
+| **`tabBarStyle`**           | Customizes the physical bar at the bottom (height, background color, padding).          |
+| **`Tabs.Screen`**           | Used inside `<Tabs>` to define specific pages or override settings for individual tabs. |
 
 ---
+
+### 5. Cleaning up the Root Layout
+
+To prevent **double headers** (one appearing from the root Stack and one from the Tabs layout), ensure the `(dashboard)` group has its header hidden in your main entry point.
+
+**File:** `./app/_layout.jsx`
+
+```javascript
+<Stack>
+  <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+  <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
+</Stack>
+```
+
+> [!TIP]
+> **Pro Tip:** If your navigation changes don't show up immediately, reload the app manually (shake the phone or press **'r'** in the terminal). Live reload sometimes misses structural navigation updates.
