@@ -26,7 +26,7 @@ To see the specific code, notes, and screenshots for any lesson, switch to the c
 - [x] **09:** [Tabs Navigation](https://github.com/aqibmunir8/React-Native/tree/video-9-Tabs-Navigation)
 
 - [x] **10:** [Tab Bar Icons](https://github.com/aqibmunir8/React-Native/tree/video-10-Tabs-Bar-Icons)
-- [ ] **11:** Safe Area View
+- [x] **11:** [Safe Area View](https://github.com/aqibmunir8/React-Native/tree/video-11-Safe-Area-View)
 
 ### Authentication (Appwrite)
 
