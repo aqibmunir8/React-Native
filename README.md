@@ -1,73 +1,76 @@
-# React Native Learning Journey 📱
+## 10- Custom Tab Icons & Vector Icons
 
-This repository tracks my progress through the **Net Ninja React Native** series. I am building "Shelfie," a book-tracking application, while mastering Expo Router, custom theming, and backend integration.
+### 1. Installing Icon Packages
 
-## 🚀 Navigation through this Repo
+React Native doesn't include icons by default. In the Expo ecosystem, we use `@expo/vector-icons`, which bundles several popular icon sets like Ionicons, FontAwesome, and Material Design.
 
-To see the specific code, notes, and screenshots for any lesson, switch to the corresponding branch using the GitHub branch selector.
+- **Installation:** If not already present, run:
 
-| Section      | Milestone                     | Status                    |
-| :----------- | :---------------------------- | :------------------------ |
-| **Basics**   | Navigation, Theming & Layouts | ✅ Completed (Videos 1-8) |
-| **Auth**     | Appwrite Auth & Context       | ⏳ Upcoming               |
-| **Database** | CRUD Operations & Real-time   | ⏳ Upcoming               |
+```bash
+npm expo install @expo/vector-icons
+```
 
----
+- **Importing:** Choose a specific set (e.g., Ionicons):
 
-## 📚 Curriculum Roadmap
+```bash
+import { Ionicons } from '@expo/vector-icons';
+```
 
-### Native Basics
+### 2. The `tabBarIcon` Property
 
-- [x] **01-04:** Introduction, Components, & File-based Navigation
-- [x] **05:** [Light & Dark Modes](https://github.com/aqibmunir8/React-Native/tree/video-5-light-and-dark-theme)
-- [x] **06:** [Themed UI Components](https://github.com/aqibmunir8/React-Native/tree/video-6-Themed-UI-Components)
-- [x] **07:** [Route Groups & Nested Layouts](https://github.com/aqibmunir8/React-Native/tree/video-7-route-groups-and-nested-layouts)
-- [x] **08:** [Pressable Component](https://github.com/aqibmunir8/React-Native/tree/video-8-Pressable-Component)
-- [ ] **09:** Tabs Navigation
-- [ ] **10:** Tab Bar Icons
-- [ ] **11:** Safe Area View
+To replace the default triangles, we use the `tabBarIcon` property inside the `options` prop of a `Tabs.Screen`.
 
-### Authentication (Appwrite)
+- **The Function:** The value of `tabBarIcon` is a function that receives an object. We destructure `{ focused }` from this object to know if the tab is currently active.
+- **Return Value:** The function must return a component (like `<Ionicons />`).
 
-##### Backend Setup & Auth Forms
+### 3. Dynamic Icons (The Outline Pattern)
 
-- [ ] **12** Backend Setup
-- [ ] **13** Login and Signup Forms
-- [ ] **14** Making an Auth Context
-- [ ] **15** Logging Users In
-- [ ] **16** Showing Error Messages
-- [ ] **17** Logging Users Out
-- [ ] **18** Initial Auth State
-- [ ] **19** Protecting Routes
-- [ ] **20** Activity Indicators
+A common UI pattern in mobile apps is to show an **outlined** icon when a tab is inactive and a **filled** icon when it is focused. We use a ternary operator to switch names:
 
-### Database & Real-time Data
+```bash
+tabBarIcon: ({ focused }) => (
+  <Ionicons
+    size={24}
+    name={focused ? 'person': 'person-outline'}
+    color={focused ? theme.iconColorFocused : theme.iconColor}
+  />
+)
+```
 
-- [ ] **21** Database Setup
-- [ ] **22:** Books Context
-- [ ] **23** Creating New Records
-- [ ] **24** Fetching Book Records
-- [ ] **25** Using the FlatList Component
-- [ ] **26** Real-Time Data
-- [ ] **27** Dynamic Routes
-- [ ] **28** Fetching Single Records
-- [ ] **29** Deleting Books
+![Tab Icons](./README/2.png)
 
----
+### 4. Implementation Example
 
-## 🛠️ Built With
+Here is how the individual screens are configured in the `(dashboard)/_layout.jsx`:
 
-- **Framework:** [Expo](https://expo.dev/) / React Native
-- **Routing:** Expo Router (File-based)
-- **Icons:** Lucide React Native / FontAwesome
-- **Backend:** Appwrite (Planned)
+| **Screen**  | **Focused Icon** | **Unfocused Icon** |
+| ----------- | ---------------- | ------------------ |
+| **Books**   | `book`           | `book-outline`     |
+| **Create**  | `create`         | `create-outline`   |
+| **Profile** | `person`         | `person-outline`   |
 
-## ✍️ Personal Notes
+**Code Snippet:**
 
-I am documenting my technical notes for each video using **Notion**. Detailed code snippets and implementation logic can be found in the README of each specific branch.
+```bash
+<Tabs.Screen
+  name="profile"
+  options={{
+    title: "Profile",
+    tabBarIcon: ({ focused }) => (
+      <Ionicons
+        name={focused ? 'person' : 'person-outline'}
+        size={24}
+        color={focused ? theme.iconColorFocused : theme.iconColor}
+      />
+    )
+  }}
+/>
+```
 
----
+![Tab Icons](./README/1.png)
 
-_Created by [aqibmunir8](https://github.com/aqibmunir8)_
+### Key Takeaways
 
----
+- **Feedback:** Using the `focused` state for both the **icon name** and the **color** provides clear visual feedback to the user.
+- **Consistency:** Always use the same icon set (e.g., all `Ionicons`) across your tabs to maintain a consistent visual style.
+- **Sizing:** A `size` of `24` is standard for bottom tab navigation, ensuring they are touch-friendly but not overwhelming.
