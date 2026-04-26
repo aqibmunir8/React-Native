@@ -3,30 +3,28 @@ import {
   Text,
   Keyboard,
   TouchableWithoutFeedback,
-  TextInput,
 } from "react-native";
 import { Link } from "expo-router";
 import { useState } from "react";
+import { useUser } from "../../hooks/useUser";
 
 import ThemedView from "../../components/ThemedView";
 import ThemedText from "../../components/ThemedText";
 import Spacer from "../../components/Spacer";
 import ThemedButton from "../../components/ThemedButton";
 import ThemedTextInput from "../../components/ThemedTextInput";
-import { useUser } from "../../hooks/useUser";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { login } = useUser();
+  const { user, login } = useUser();
 
   const handleSubmit = async () => {
     try {
       await login(email, password);
-    } catch (error) {
-      console.log(error.message);
-    }
+      console.log("current user is: ", user);
+    } catch (error) {}
   };
 
   return (
@@ -34,7 +32,7 @@ const Login = () => {
       <ThemedView style={styles.container}>
         <Spacer />
         <ThemedText title={true} style={styles.title}>
-          Hiiii
+          Login to Your Account
         </ThemedText>
 
         {/* <TextInput placeholder="Email" /> */}
