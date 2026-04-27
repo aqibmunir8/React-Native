@@ -13,6 +13,7 @@ import ThemedText from "../../components/ThemedText";
 import Spacer from "../../components/Spacer";
 import ThemedButton from "../../components/ThemedButton";
 import ThemedTextInput from "../../components/ThemedTextInput";
+import ThemedLoader from "../../components/ThemedLoader";
 import { Colors } from "../../constants/Colors";
 
 const Login = () => {
@@ -39,9 +40,7 @@ const Login = () => {
         <ThemedText title={true} style={styles.title}>
           Login to Your Account
         </ThemedText>
-
         {/* <TextInput placeholder="Email" /> */}
-
         <Spacer />
         <ThemedTextInput
           style={{ marginBottom: 20, width: "80%" }}
@@ -50,7 +49,6 @@ const Login = () => {
           onChangeText={setEmail}
           keyboardType="email-address"
         />
-
         <ThemedTextInput
           style={{ marginBottom: 20, width: "80%" }}
           placeholder="Password"
@@ -58,14 +56,11 @@ const Login = () => {
           onChangeText={setPassword}
           secureTextEntry
         />
-
         <ThemedButton onPress={handleSubmit}>
           <Text style={{ color: "#f2f2f2" }}>Login</Text>
         </ThemedButton>
-
         <Spacer />
         {error && <Text style={styles.error}>{error}</Text>}
-
         <Spacer height={100} />
         <Link href="/register" replace>
           <ThemedText style={{ textAlign: "center" }}>
