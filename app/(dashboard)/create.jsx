@@ -14,34 +14,41 @@ import ThemedText from "../../components/ThemedText";
 import ThemedTextInput from "../../components/ThemedTextInput";
 import ThemedButton from "../../components/ThemedButton";
 import Spacer from "../../components/Spacer";
+import { Colors } from "../../constants/Colors";
 
 const Create = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState();
 
   const { createBook } = useBooks();
   const router = useRouter();
 
   async function handleSubmit() {
-    if (!title.trim() || !author.trim() || !description.trim()) return;
+    setError(null);
+    try {
+      if (!title.trim() || !author.trim() || !description.trim()) return;
 
-    setLoading(true);
+      setLoading(true);
 
-    // create the book
-    await createBook({ title, author, description });
+      // create the book
+      await createBook({ title, author, description });
 
-    // reset fields
-    setTitle("");
-    setAuthor("");
-    setDescription("");
+      // reset fields
+      setTitle("");
+      setAuthor("");
+      setDescription("");
 
-    // redirect
-    router.replace("/books");
+      // redirect
+      router.replace("/books");
 
-    // reset loading state
-    setLoading(false);
+      // reset loading state
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+    }
   }
 
   return (
@@ -79,9 +86,12 @@ const Create = () => {
 
         <ThemedButton onPress={handleSubmit} disabled={loading}>
           <Text style={{ color: "#fff" }}>
-            {loading ? "Saving..." : "Create Book"}
+            {/* if error happened button should be like ": (" instead of "Create Book" */}
+            {error ? ":(" : loading ? "Saving..." : "Create Book"}
           </Text>
         </ThemedButton>
+        <Spacer />
+        {error && <Text style={styles.error}>{error}</Text>}
       </ThemedView>
     </TouchableWithoutFeedback>
   );
@@ -112,5 +122,14 @@ const styles = StyleSheet.create({
     minHeight: 100,
     alignSelf: "stretch",
     marginHorizontal: 40,
+  },
+  error: {
+    color: Colors.warning,
+    padding: 10,
+    backgroundColor: "#f5c1c8",
+    borderColor: Colors.warning,
+    borderWidth: 1,
+    borderRadius: 6,
+    marginHorizontal: 10,
   },
 });

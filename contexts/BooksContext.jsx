@@ -40,7 +40,7 @@ export function BooksProvider({ children }) {
         ],
       );
     } catch (error) {
-      console.log(error.message);
+      throw Error(error.message);
     }
   }
 
