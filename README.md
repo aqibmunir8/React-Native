@@ -1,76 +1,113 @@
-# React Native Learning Journey 📱
+# Error Handling in React Native & Appwrite
 
-This repository tracks my progress through the **Net Ninja React Native** series. I am building "Shelfie," a book-tracking application, while mastering Expo Router, custom theming, and backend integration.
-
-## 🚀 Navigation through this Repo
-
-To see the specific code, notes, and screenshots for any lesson, switch to the corresponding branch using the GitHub branch selector.
-
-| Section      | Milestone                     | Status       |
-| :----------- | :---------------------------- | :----------- |
-| **Basics**   | Navigation, Theming & Layouts | ✅ Completed |
-| **Auth**     | Appwrite Auth & Context       | ⏳ Progress  |
-| **Database** | CRUD Operations & Real-time   | ⏳ Upcoming  |
+These notes cover the implementation of robust error handling when working with a backend like Appwrite. The focus is on the **"Throw & Catch"** pattern—throwing errors from a global context and catching them in individual screens to update the UI dynamically.
 
 ---
 
-## 📚 Curriculum Roadmap
+## 1. The "Throw & Catch" Pattern
 
-### Native Basics
+When using a service like Appwrite, errors often occur inside your **Context** (the logic layer). Instead of simply logging them to the console, you must **throw** them. This ensures the UI component calling the function is notified that an operation failed.
 
-- [x] **01-04:** Introduction, Components, & File-based Navigation
-- [x] **05:** [Light & Dark Modes](https://github.com/aqibmunir8/React-Native/tree/video-5-light-and-dark-theme)
-- [x] **06:** [Themed UI Components](https://github.com/aqibmunir8/React-Native/tree/video-6-Themed-UI-Components)
-- [x] **07:** [Route Groups & Nested Layouts](https://github.com/aqibmunir8/React-Native/tree/video-7-route-groups-and-nested-layouts)
-- [x] **08:** [Pressable Component](https://github.com/aqibmunir8/React-Native/tree/video-8-Pressable-Component)
-- [x] **09:** [Tabs Navigation](https://github.com/aqibmunir8/React-Native/tree/video-9-Tabs-Navigation)
+**File:** `./contexts/UserContext.jsx`
 
-- [x] **10:** [Tab Bar Icons](https://github.com/aqibmunir8/React-Native/tree/video-10-Tabs-Bar-Icons)
-- [x] **11:** [Safe Area View](https://github.com/aqibmunir8/React-Native/tree/video-11-Safe-Area-View)
+Replace `console.log(error)` with `throw error`. This propagates the error up to the component that triggered the request.
 
-### Authentication (Appwrite)
-
-##### Backend Setup & Auth Forms
-
-- [x] **12** [Backend Setup](https://github.com/aqibmunir8/React-Native/tree/video-12-Backend-setup-with-AppWrite)
-
-- [x] **13** [Login and Signup Forms](https://github.com/aqibmunir8/React-Native/tree/video-13-Login-and-Signup-Forms)
-
-- [ ] **14** Making an Auth Context
-- [ ] **15** Logging Users In
-- [ ] **16** Showing Error Messages
-- [ ] **17** Logging Users Out
-- [ ] **18** Initial Auth State
-- [ ] **19** Protecting Routes
-- [ ] **20** Activity Indicators
-
-### Database & Real-time Data
-
-- [ ] **21** Database Setup
-- [ ] **22:** Books Context
-- [ ] **23** Creating New Records
-- [ ] **24** Fetching Book Records
-- [ ] **25** Using the FlatList Component
-- [ ] **26** Real-Time Data
-- [ ] **27** Dynamic Routes
-- [ ] **28** Fetching Single Records
-- [ ] **29** Deleting Books
+```jsx
+async function register(email, password) {
+  try {
+    await account.create(ID.unique(), email, password);
+    await login(email, password);
+  } catch (error) {
+    // Propagate the error so the UI can 'catch' and display it
+    throw error;
+  }
+}
+```
 
 ---
 
-## 🛠️ Built With
+## 2. Managing Error State in Screens
 
-- **Framework:** [Expo](https://expo.dev/) / React Native
-- **Routing:** Expo Router (File-based)
-- **Icons:** Lucide React Native / FontAwesome
-- **Backend:** Appwrite (Planned)
+Each authentication screen (Login or Register) needs its own local state to track and display errors to the user.
 
-## ✍️ Personal Notes
+**File:** `./app/(auth)/login.jsx` (or `register.jsx`)
 
-I am documenting my technical notes for each video using **Notion**. Detailed code snippets and implementation logic can be found in the README of each specific branch.
+- **Initial State:** Start with `null`.
+- **The Reset Pattern:** Always set the error back to `null` at the start of a new submission. This clears old error messages while the new request is processing.
+
+```jsx
+const [error, setError] = useState(null);
+
+const handleSubmit = async () => {
+  setError(null); // Step 1: Reset before trying again
+
+  try {
+    await login(email, password);
+  } catch (err) {
+    setError(err.message); // Step 2: Capture the Appwrite error message
+  }
+};
+```
 
 ---
 
-_Created by [aqibmunir8](https://github.com/aqibmunir8)_
+## 3. Conditional Rendering of Errors
+
+Use the **short-circuit operator (`&&`)** to render the error message only when the state contains a value.
+
+**File:** `./app/(auth)/login.jsx`
+
+```jsx
+{
+  error && (
+    <>
+      <Spacer height={20} />
+      <Text style={styles.errorText}>{error}</Text>
+    </>
+  );
+}
+```
+
+> **Tip:** Appwrite error messages (e.g., "Invalid credentials") can be technical. In a production app, consider mapping these codes to user-friendly strings like _"Oops! That password doesn't look right."_
 
 ---
+
+## 4. Styling for Visibility
+
+Use high-contrast "Warning" colors (like Red or Orange) to ensure the error is immediately visible to the user.
+
+**Common Error Styles:**
+
+```jsx
+const styles = StyleSheet.create({
+  errorText: {
+    color: "#cc475a", // Warning Red
+    backgroundColor: "#ffebee",
+    padding: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#cc475a",
+    textAlign: "center",
+    marginHorizontal: 20,
+  },
+});
+```
+
+![Alt Text](./image.jpg)
+
+---
+
+## 5. Logic Flow Summary
+
+| Step           | Location      | Action                                                         |
+| :------------- | :------------ | :------------------------------------------------------------- |
+| **1. Request** | `UserContext` | Calls the Appwrite API.                                        |
+| **2. Failure** | `UserContext` | `catch` block executes and `throws` the error.                 |
+| **3. Handle**  | `login.jsx`   | `handleSubmit` catches the error and calls `setError`.         |
+| **4. Display** | `login.jsx`   | The UI detects `error` is truthy and renders the `<Text>` box. |
+
+---
+
+## 💡 Key Takeaway
+
+Errors are a critical part of the **User Experience (UX)**, not just for developer debugging. By using local state and conditional rendering, you ensure the user is never left wondering why an action failed.
