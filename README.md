@@ -1,76 +1,141 @@
-# React Native Learning Journey 📱
-
-This repository tracks my progress through the **Net Ninja React Native** series. I am building "Shelfie," a book-tracking application, while mastering Expo Router, custom theming, and backend integration.
-
-## 🚀 Navigation through this Repo
-
-To see the specific code, notes, and screenshots for any lesson, switch to the corresponding branch using the GitHub branch selector.
-
-| Section      | Milestone                     | Status       |
-| :----------- | :---------------------------- | :----------- |
-| **Basics**   | Navigation, Theming & Layouts | ✅ Completed |
-| **Auth**     | Appwrite Auth & Context       | ⏳ Progress  |
-| **Database** | CRUD Operations & Real-time   | ⏳ Upcoming  |
+These notes outline the setup of a **Books Context** to manage the global state for your reading list. Like the user context, this follows the **Provider Pattern**, making book data available throughout the entire application.
 
 ---
 
-## 📚 Curriculum Roadmap
+## **1. Creating the Books Context**
 
-### Native Basics
+This file houses the state (an array of books) and the logic (CRUD operations) for interacting with Appwrite.
 
-- [x] **01-04:** Introduction, Components, & File-based Navigation
-- [x] **05:** [Light & Dark Modes](https://github.com/aqibmunir8/React-Native/tree/video-5-light-and-dark-theme)
-- [x] **06:** [Themed UI Components](https://github.com/aqibmunir8/React-Native/tree/video-6-Themed-UI-Components)
-- [x] **07:** [Route Groups & Nested Layouts](https://github.com/aqibmunir8/React-Native/tree/video-7-route-groups-and-nested-layouts)
-- [x] **08:** [Pressable Component](https://github.com/aqibmunir8/React-Native/tree/video-8-Pressable-Component)
-- [x] **09:** [Tabs Navigation](https://github.com/aqibmunir8/React-Native/tree/video-9-Tabs-Navigation)
+**File Path:** `./contexts/BooksContext.jsx`
 
-- [x] **10:** [Tab Bar Icons](https://github.com/aqibmunir8/React-Native/tree/video-10-Tabs-Bar-Icons)
-- [x] **11:** [Safe Area View](https://github.com/aqibmunir8/React-Native/tree/video-11-Safe-Area-View)
+- **`databaseId` & `collectionId`**: These are constants copied from your Appwrite Console. You must provide these to every Appwrite database method so it knows which "table" to use.
+- **Initial State**: We use an empty array `[]` as the default value for books.
 
-### Authentication (Appwrite)
+```jsx
+import { createContext, useState } from "react";
 
-##### Backend Setup & Auth Forms
+// Replace with your actual IDs from Appwrite Console
+const databaseId = "YOUR_DATABASE_ID";
+const collectionId = "YOUR_COLLECTION_ID";
 
-- [x] **12** [Backend Setup](https://github.com/aqibmunir8/React-Native/tree/video-12-Backend-setup-with-AppWrite)
+export const BooksContext = createContext();
 
-- [x] **13** [Login and Signup Forms](https://github.com/aqibmunir8/React-Native/tree/video-13-Login-and-Signup-Forms)
+export function BooksProvider({ children }) {
+  const [books, setBooks] = useState([]);
 
-- [ ] **14** Making an Auth Context
-- [ ] **15** Logging Users In
-- [ ] **16** Showing Error Messages
-- [ ] **17** Logging Users Out
-- [ ] **18** Initial Auth State
-- [ ] **19** Protecting Routes
-- [ ] **20** Activity Indicators
+  // --- Placeholder Functions (Logic added in future lessons) ---
+  async function fetchBooks() {
+    try {
+      /* Appwrite logic here */
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
-### Database & Real-time Data
+  async function fetchBookById(id) {
+    try {
+      /* Appwrite logic here */
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
-- [ ] **21** Database Setup
-- [ ] **22:** Books Context
-- [ ] **23** Creating New Records
-- [ ] **24** Fetching Book Records
-- [ ] **25** Using the FlatList Component
-- [ ] **26** Real-Time Data
-- [ ] **27** Dynamic Routes
-- [ ] **28** Fetching Single Records
-- [ ] **29** Deleting Books
+  async function createBook(bookData) {
+    try {
+      /* Appwrite logic here */
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function deleteBook(id) {
+    try {
+      /* Appwrite logic here */
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  return (
+    <BooksContext.Provider
+      value={{ books, fetchBooks, fetchBookById, createBook, deleteBook }}
+    >
+      {children}
+    </BooksContext.Provider>
+  );
+}
+```
 
 ---
 
-## 🛠️ Built With
+## **2. Nesting Providers in the Root Layout**
 
-- **Framework:** [Expo](https://expo.dev/) / React Native
-- **Routing:** Expo Router (File-based)
-- **Icons:** Lucide React Native / FontAwesome
-- **Backend:** Appwrite (Planned)
+Order matters when nesting Context Providers. Since the `BooksProvider` will eventually need to know which user is logged in (to filter books by `userId`), it must be placed **inside** the `UserProvider`.
 
-## ✍️ Personal Notes
+**File Path:** `./app/_layout.jsx`
 
-I am documenting my technical notes for each video using **Notion**. Detailed code snippets and implementation logic can be found in the README of each specific branch.
+```jsx
+import { UserProvider } from "../contexts/UserContext";
+import { BooksProvider } from "../contexts/BooksContext";
+import { Stack } from "expo-router";
+
+export default function RootLayout() {
+  return (
+    <UserProvider>
+      <BooksProvider>
+        {/* Everything inside here can access BOTH User and Books data */}
+        <Stack />
+      </BooksProvider>
+    </UserProvider>
+  );
+}
+```
 
 ---
 
-_Created by [aqibmunir8](https://github.com/aqibmunir8)_
+## **3. The Custom Hook: `useBooks`**
+
+This hook makes consuming book data easy and prevents errors if the hook is accidentally used outside of a Provider.
+
+**File Path:** `./hooks/useBooks.js`
+
+```jsx
+import { useContext } from "react";
+import { BooksContext } from "../contexts/BooksContext";
+
+export function useBooks() {
+  const context = useContext(BooksContext);
+
+  if (!context) {
+    throw new Error("useBooks must be used within a BooksProvider");
+  }
+
+  return context;
+}
+```
 
 ---
+
+## **4. CRUD Logic Overview**
+
+| **Function**        | **Purpose**                          | **Input Required**                                  |
+| ------------------- | ------------------------------------ | --------------------------------------------------- |
+| **`fetchBooks`**    | Gets all books for the current user. | None (Uses global `userId`).                        |
+| **`fetchBookById`** | Gets details for a single book.      | The unique `ID` of the document.                    |
+| **`createBook`**    | Saves a new book record to Appwrite. | An object `{ title, author, description, userId }`. |
+| **`deleteBook`**    | Removes a book from the database.    | The unique `ID` of the document.                    |
+
+---
+
+## **5. Logic Flow Recap**
+
+| **Step**          | **Location**                | **Action**                                                           |
+| ----------------- | --------------------------- | -------------------------------------------------------------------- |
+| **1. Initialize** | `BooksContext.jsx`          | Define state and export the Provider.                                |
+| **2. Provide**    | `_layout.jsx`               | Wrap the app in `BooksProvider` so state is globally accessible.     |
+| **3. Access**     | `useBooks.js`               | Create a shortcut hook to tap into the "Books stream."               |
+| **4. Implement**  | Screens (e.g., `Books.jsx`) | Use the `useBooks` hook to call `fetchBooks()` and display the data. |
+
+### **Key Takeaway**
+
+By nesting `BooksProvider` inside `UserProvider`, you create a **dependency chain**. This allows your book-fetching logic to automatically "see" the logged-in user's ID from the sibling context, ensuring that a user only ever sees their own library.
