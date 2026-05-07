@@ -1,76 +1,90 @@
-# React Native Learning Journey 📱
+We simpliy gone to AppWrite, created a DB, created few Columns, and then gave permission to User, add Row Security,
+in the **:** `./lib/appwrite.js` we import Databases and export the usage of that .
 
-This repository tracks my progress through the **Net Ninja React Native** series. I am building "Shelfie," a book-tracking application, while mastering Expo Router, custom theming, and backend integration.
-
-## 🚀 Navigation through this Repo
-
-To see the specific code, notes, and screenshots for any lesson, switch to the corresponding branch using the GitHub branch selector.
-
-| Section      | Milestone                     | Status       |
-| :----------- | :---------------------------- | :----------- |
-| **Basics**   | Navigation, Theming & Layouts | ✅ Completed |
-| **Auth**     | Appwrite Auth & Context       | ⏳ Progress  |
-| **Database** | CRUD Operations & Real-time   | ⏳ Upcoming  |
+that’s it.
 
 ---
 
-## 📚 Curriculum Roadmap
-
-### Native Basics
-
-- [x] **01-04:** Introduction, Components, & File-based Navigation
-- [x] **05:** [Light & Dark Modes](https://github.com/aqibmunir8/React-Native/tree/video-5-light-and-dark-theme)
-- [x] **06:** [Themed UI Components](https://github.com/aqibmunir8/React-Native/tree/video-6-Themed-UI-Components)
-- [x] **07:** [Route Groups & Nested Layouts](https://github.com/aqibmunir8/React-Native/tree/video-7-route-groups-and-nested-layouts)
-- [x] **08:** [Pressable Component](https://github.com/aqibmunir8/React-Native/tree/video-8-Pressable-Component)
-- [x] **09:** [Tabs Navigation](https://github.com/aqibmunir8/React-Native/tree/video-9-Tabs-Navigation)
-
-- [x] **10:** [Tab Bar Icons](https://github.com/aqibmunir8/React-Native/tree/video-10-Tabs-Bar-Icons)
-- [x] **11:** [Safe Area View](https://github.com/aqibmunir8/React-Native/tree/video-11-Safe-Area-View)
-
-### Authentication (Appwrite)
-
-##### Backend Setup & Auth Forms
-
-- [x] **12** [Backend Setup](https://github.com/aqibmunir8/React-Native/tree/video-12-Backend-setup-with-AppWrite)
-
-- [x] **13** [Login and Signup Forms](https://github.com/aqibmunir8/React-Native/tree/video-13-Login-and-Signup-Forms)
-
-- [ ] **14** Making an Auth Context
-- [ ] **15** Logging Users In
-- [ ] **16** Showing Error Messages
-- [ ] **17** Logging Users Out
-- [ ] **18** Initial Auth State
-- [ ] **19** Protecting Routes
-- [ ] **20** Activity Indicators
-
-### Database & Real-time Data
-
-- [ ] **21** Database Setup
-- [ ] **22:** Books Context
-- [ ] **23** Creating New Records
-- [ ] **24** Fetching Book Records
-- [ ] **25** Using the FlatList Component
-- [ ] **26** Real-Time Data
-- [ ] **27** Dynamic Routes
-- [ ] **28** Fetching Single Records
-- [ ] **29** Deleting Books
+These notes cover setting up the **Appwrite Database** service. This includes creating the database, defining the schema (attributes), and configuring permissions to ensure users can only see their own data.
 
 ---
 
-## 🛠️ Built With
+## **1. Appwrite Database Concepts**
 
-- **Framework:** [Expo](https://expo.dev/) / React Native
-- **Routing:** Expo Router (File-based)
-- **Icons:** Lucide React Native / FontAwesome
-- **Backend:** Appwrite (Planned)
+Appwrite uses a NoSQL-like structure, but with a strict schema to ensure data integrity.
 
-## ✍️ Personal Notes
-
-I am documenting my technical notes for each video using **Notion**. Detailed code snippets and implementation logic can be found in the README of each specific branch.
+- **Database**: The top-level container for your application data.
+- **Collection**: Similar to a **Table** in SQL. It groups similar records (e.g., a "books" collection).
+- **Document**: A single record or row within a collection.
+- **Attributes**: The specific fields or columns (e.g., `title`, `author`).
 
 ---
 
-_Created by [aqibmunir8](https://github.com/aqibmunir8)_
+## **2. Creating the Collection & Attributes**
+
+Every collection needs a **Schema** (Structure). Appwrite enforces this; if you try to save a document that doesn't match these attributes, the request will fail.
+
+**Setup Steps in Appwrite Console:**
+
+1. **Create Database**: e.g., `Shelfie Native App DB`.
+2. **Create Collection**: e.g., `books`.
+3. **Define Attributes**: Navigate to the **Attributes** tab and add the following:
+
+| **Attribute Key** | **Type** | **Size** | **Required** | **Description**                            |
+| ----------------- | -------- | -------- | ------------ | ------------------------------------------ |
+| `title`           | String   | 255      | Yes          | The title of the book.                     |
+| `author`          | String   | 255      | Yes          | The person who wrote the book.             |
+| `description`     | String   | 500      | Yes          | A brief summary of the book.               |
+| `userId`          | String   | 255      | Yes          | The ID of the user who created the record. |
+
+![image.png](images/a.png)
 
 ---
+
+## **3. Permissions & Document Security**
+
+By default, databases are locked. You must explicitly grant permissions to allow your React Native app to interact with them.
+
+**File Permissions Settings:**
+
+- **Add Role**: Select **"Users"** (any authenticated user).
+- **Permissions**: Check **"Create"**. This allows any logged-in user to add a new book.
+- **Document Security**: **Enable** this.
+  - _Why?_ Enabling Document Security allows us to specify that **User A** can only read/edit their own books, while **User B** can only read/edit theirs. Without this, any logged-in user could see everyone's books.
+
+![image.png](images/b.png)
+
+---
+
+## **4. Initializing the Database in the App**
+
+To use the database in your code, you must add the `Databases` service to your Appwrite configuration file.
+
+**File Path:** `./lib/appwrite.js`
+
+```jsx
+import { Client, Account, Avatars, Databases } from "react-native-appwrite";
+
+export const client = new Client();
+
+client.setProject("67c5d24d000f9172f860").setPlatform("dev.netninja.sheflie");
+
+export const account = new Account(client);
+export const avatars = new Avatars(client);
+export const databases = new Databases(client);
+```
+
+---
+
+## **5. Logic Flow Recap**
+
+| **Sequence**      | **Location**        | **Action**                                                                   |
+| ----------------- | ------------------- | ---------------------------------------------------------------------------- |
+| **1. Definition** | Appwrite Console    | Create the `books` collection and set the schema.                            |
+| **2. Security**   | Appwrite Console    | Grant "Users" create permissions and enable Document Security.               |
+| **3. Connection** | `./lib/appwrite.js` | Export the `databases` instance.                                             |
+| **4. Usage**      | Hooks/Context       | Use `databases.createDocument()` or `listDocuments()` to interact with data. |
+
+### **Key Takeaway**
+
+Defining a **Schema** (Attributes) is vital. It acts as a guardrail, ensuring your application doesn't accidentally save corrupted or incomplete data. Associating a `userId` with every document is the standard way to filter private data in a multi-user application.
