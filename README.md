@@ -1,76 +1,128 @@
-# React Native Learning Journey 📱
+# Persistent Authentication
 
-This repository tracks my progress through the **Net Ninja React Native** series. I am building "Shelfie," a book-tracking application, while mastering Expo Router, custom theming, and backend integration.
-
-## 🚀 Navigation through this Repo
-
-To see the specific code, notes, and screenshots for any lesson, switch to the corresponding branch using the GitHub branch selector.
-
-| Section      | Milestone                     | Status       |
-| :----------- | :---------------------------- | :----------- |
-| **Basics**   | Navigation, Theming & Layouts | ✅ Completed |
-| **Auth**     | Appwrite Auth & Context       | ⏳ Progress  |
-| **Database** | CRUD Operations & Real-time   | ⏳ Upcoming  |
+These notes explain how to achieve Persistent Authentication. When you reload a mobile app, the JavaScript state (RAM) is wiped. You must reach out to Appwrite during the app's startup phase to check if a valid session still exists on the server and restore the user state.
 
 ---
 
-## 📚 Curriculum Roadmap
+### 1. The Problem: State Reset on Reload
 
-### Native Basics
+Even if a user is "logged in" on the Appwrite backend, reloading the app resets the user state in your React Context to null. This causes errors when components try to access `user.email`.
 
-- [x] **01-04:** Introduction, Components, & File-based Navigation
-- [x] **05:** [Light & Dark Modes](https://github.com/aqibmunir8/React-Native/tree/video-5-light-and-dark-theme)
-- [x] **06:** [Themed UI Components](https://github.com/aqibmunir8/React-Native/tree/video-6-Themed-UI-Components)
-- [x] **07:** [Route Groups & Nested Layouts](https://github.com/aqibmunir8/React-Native/tree/video-7-route-groups-and-nested-layouts)
-- [x] **08:** [Pressable Component](https://github.com/aqibmunir8/React-Native/tree/video-8-Pressable-Component)
-- [x] **09:** [Tabs Navigation](https://github.com/aqibmunir8/React-Native/tree/video-9-Tabs-Navigation)
+```javascript
+import { createContext, useState, useEffect } from "react";
+import { account } from "../lib/appwrite";
 
-- [x] **10:** [Tab Bar Icons](https://github.com/aqibmunir8/React-Native/tree/video-10-Tabs-Bar-Icons)
-- [x] **11:** [Safe Area View](https://github.com/aqibmunir8/React-Native/tree/video-11-Safe-Area-View)
+export const UserContext = createContext();
 
-### Authentication (Appwrite)
+export function UserProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false); // Flag for startup check
 
-##### Backend Setup & Auth Forms
+  useEffect(() => {
+    getInitialUserValue();
+  }, []);
 
-- [x] **12** [Backend Setup](https://github.com/aqibmunir8/React-Native/tree/video-12-Backend-setup-with-AppWrite)
+  async function getInitialUserValue() {
+    try {
+      const response = await account.get(); // Reach out to Appwrite
+      setUser(response); // If session exists, update state
+    } catch (error) {
+      setUser(null); // No session found
+    } finally {
+      setAuthChecked(true); // Check is complete, regardless of outcome
+    }
+  }
 
-- [x] **13** [Login and Signup Forms](https://github.com/aqibmunir8/React-Native/tree/video-13-Login-and-Signup-Forms)
+  // ... login, register, logout functions ...
 
-- [ ] **14** Making an Auth Context
-- [ ] **15** Logging Users In
-- [ ] **16** Showing Error Messages
-- [ ] **17** Logging Users Out
-- [ ] **18** Initial Auth State
-- [ ] **19** Protecting Routes
-- [ ] **20** Activity Indicators
-
-### Database & Real-time Data
-
-- [ ] **21** Database Setup
-- [ ] **22:** Books Context
-- [ ] **23** Creating New Records
-- [ ] **24** Fetching Book Records
-- [ ] **25** Using the FlatList Component
-- [ ] **26** Real-Time Data
-- [ ] **27** Dynamic Routes
-- [ ] **28** Fetching Single Records
-- [ ] **29** Deleting Books
-
----
-
-## 🛠️ Built With
-
-- **Framework:** [Expo](https://expo.dev/) / React Native
-- **Routing:** Expo Router (File-based)
-- **Icons:** Lucide React Native / FontAwesome
-- **Backend:** Appwrite (Planned)
-
-## ✍️ Personal Notes
-
-I am documenting my technical notes for each video using **Notion**. Detailed code snippets and implementation logic can be found in the README of each specific branch.
+  return (
+    <UserContext.Provider
+      value={{ user, authChecked, login, logout, register }}
+    >
+      {children}
+    </UserContext.Provider>
+  );
+}
+```
 
 ---
 
-_Created by [aqibmunir8](https://github.com/aqibmunir8)_
+### 2. Restoring User State
+
+We use a `useEffect` hook inside the provider to run a "check" once the app starts.
+
+**File Path:** `./contexts/UserContext.jsx`
+
+- **`account.get()`**: The key Appwrite method that returns the current session if it exists.
+- **`authChecked` Flag**: A secondary bit of state used to track if the initial check has finished. This prevents the app from assuming a user is "logged out" just because the network request hasn't finished yet.
 
 ---
+
+### 3. Using the User Data in the UI
+
+Once the state is restored, you can display user-specific details on the dashboard.
+
+**File Path:** `./app/(dashboard)/profile.jsx`
+
+```javascript
+import { useUser } from "../../hooks/useUser";
+import ThemedText from "../../components/ThemedText";
+import ThemedView from "../../components/ThemedView";
+
+const Profile = () => {
+  const { user } = useUser();
+
+  return (
+    <ThemedView style={styles.container}>
+      {/* Display the email from the Appwrite user object */}
+      <ThemedText title={true}>
+        {user ? user.email : "Not Logged In"}
+      </ThemedText>
+    </ThemedView>
+  );
+};
+```
+
+---
+
+### 4. Preventing "Null" Errors
+
+If you try to access `user.email` while `user` is null (e.g., right after logging out or before the startup check finishes), the app will crash.
+
+**Safe Access Patterns:**
+
+- **Optional Chaining:** `user?.email` (returns undefined instead of crashing).
+- **Conditional Rendering:** `{user && <Text>{user.email}</Text>}`.
+- **Auth Guards:** (Coming in the next lesson) Redirecting users away from the page entirely if they aren't logged in.
+
+---
+
+### 5. Logic Flow Recap
+
+| Phase          | Action                             | Result                                  |
+| :------------- | :--------------------------------- | :-------------------------------------- |
+| **App Starts** | `UserProvider` mounts.             | `user` is null, `authChecked` is false. |
+| **Check Runs** | `useEffect` calls `account.get()`. | A network request goes to Appwrite.     |
+| **Response**   | Appwrite returns the user object.  | `setUser(response)` is called.          |
+| **Finalize**   | `finally` block runs.              | `setAuthChecked(true)` is set.          |
+| **Render**     | `Profile.jsx` re-renders.          | The user's email becomes visible.       |
+
+**Key Takeaway**
+The `authChecked` flag is vital for User Experience. It allows you to show a loading spinner or a blank screen until you are certain about the user's authentication status, preventing "flicker" where the app shows the login screen for a split second before realizing the user is actually logged in.
+
+- Implement a Loading Screen using the `authChecked` flag
+- Learn about Protected Routes in Expo Router
+
+---
+
+#### Now In Action
+
+![Alt Text](./images/image1.jpg)
+
+#### Great
+
+but but if use is not logged in → and tryna access the Profile Page this wil happen
+![Alt Text](./images/image2.png)
+
+as user → Null, and try to access email value from the Null will cause the Error
+SO →
