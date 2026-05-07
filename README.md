@@ -9,8 +9,8 @@ To see the specific code, notes, and screenshots for any lesson, switch to the c
 | Section      | Milestone                     | Status       |
 | :----------- | :---------------------------- | :----------- |
 | **Basics**   | Navigation, Theming & Layouts | ✅ Completed |
-| **Auth**     | Appwrite Auth & Context       | ⏳ Progress  |
-| **Database** | CRUD Operations & Real-time   | ⏳ Upcoming  |
+| **Auth**     | Appwrite Auth & Context       | ✅ Completed |
+| **Database** | CRUD Operations & Real-time   | ✅ Completed |
 
 ---
 
@@ -36,25 +36,25 @@ To see the specific code, notes, and screenshots for any lesson, switch to the c
 
 - [x] **13** [Login and Signup Forms](https://github.com/aqibmunir8/React-Native/tree/video-13-Login-and-Signup-Forms)
 
-- [ ] **14** Making an Auth Context
-- [ ] **15** Logging Users In
-- [ ] **16** Showing Error Messages
-- [ ] **17** Logging Users Out
-- [ ] **18** Initial Auth State
-- [ ] **19** Protecting Routes
-- [ ] **20** Activity Indicators
+- [x] **14** [Making an Auth Context](https://github.com/aqibmunir8/React-Native/tree/video-14-Making-Auth-Context)
+- [x] **15** [Logging Users In](https://github.com/aqibmunir8/React-Native/tree/video-15-Logging-Users-In)
+- [x] **16** [Showing Error Messages](https://github.com/aqibmunir8/React-Native/tree/video-16-Showing-Error-Messages)
+- [x] **17** [Logging Users Out](https://github.com/aqibmunir8/React-Native/tree/video-17-Logging-Users-Out)
+- [x] **18** [Initial Auth State](https://github.com/aqibmunir8/React-Native/tree/video-18-Initial-Auth-State)
+- [x] **19** [Protecting Routes](https://github.com/aqibmunir8/React-Native/tree/video-19-Protecting-Routes)
+- [x] **20** [Activity Indicators](https://github.com/aqibmunir8/React-Native/tree/video-20-Activity-Indicators)
 
 ### Database & Real-time Data
 
-- [ ] **21** Database Setup
-- [ ] **22:** Books Context
-- [ ] **23** Creating New Records
-- [ ] **24** Fetching Book Records
-- [ ] **25** Using the FlatList Component
-- [ ] **26** Real-Time Data
-- [ ] **27** Dynamic Routes
-- [ ] **28** Fetching Single Records
-- [ ] **29** Deleting Books
+- [x] **21** [Database Setup](https://github.com/aqibmunir8/React-Native/tree/video-21-Database-Setup-Appwrite)
+- [x] **22** [Books Context](https://github.com/aqibmunir8/React-Native/tree/video-22-Books-Context)
+- [x] **23** [Creating New Records](https://github.com/aqibmunir8/React-Native/tree/video-23-Creating-New-Records)
+- [x] **24** [Fetching Book Records](https://github.com/aqibmunir8/React-Native/tree/video-24-Fetching-Book-Records)
+- [x] **25** [Using the FlatList Components](https://github.com/aqibmunir8/React-Native/tree/video-25-Using-the-FlatList-Components)
+- [x] **26** [Real-Time Data](https://github.com/aqibmunir8/React-Native/tree/video-26-Real-Time-Data)
+- [x] **27** [Dynamic Routes](https://github.com/aqibmunir8/React-Native/tree/video-27-Dynamic-Routes)
+- [x] **28** [Fetching Single Records](https://github.com/aqibmunir8/React-Native/tree/video-28-Fetching-Single-Records)
+- [x] **29** [Deleting Books](https://github.com/aqibmunir8/React-Native/tree/video-29-Deleting-Books)
 
 ---
 
@@ -63,7 +63,7 @@ To see the specific code, notes, and screenshots for any lesson, switch to the c
 - **Framework:** [Expo](https://expo.dev/) / React Native
 - **Routing:** Expo Router (File-based)
 - **Icons:** Lucide React Native / FontAwesome
-- **Backend:** Appwrite (Planned)
+- **Backend:** Appwrite
 
 ## ✍️ Personal Notes
 
