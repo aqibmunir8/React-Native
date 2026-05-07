@@ -1,76 +1,115 @@
-# React Native Learning Journey 📱
-
-This repository tracks my progress through the **Net Ninja React Native** series. I am building "Shelfie," a book-tracking application, while mastering Expo Router, custom theming, and backend integration.
-
-## 🚀 Navigation through this Repo
-
-To see the specific code, notes, and screenshots for any lesson, switch to the corresponding branch using the GitHub branch selector.
-
-| Section      | Milestone                     | Status       |
-| :----------- | :---------------------------- | :----------- |
-| **Basics**   | Navigation, Theming & Layouts | ✅ Completed |
-| **Auth**     | Appwrite Auth & Context       | ⏳ Progress  |
-| **Database** | CRUD Operations & Real-time   | ⏳ Upcoming  |
+Here are the notes for implementing the **Logout** functionality. These cover the logic in the global context and how to trigger it from a specific dashboard page.
 
 ---
 
-## 📚 Curriculum Roadmap
+### 1. Implementing Logout Logic
 
-### Native Basics
+In Appwrite, logging out means deleting the "session" stored on the server. We also need to clear our local state so the app knows there is no longer a logged-in user.
 
-- [x] **01-04:** Introduction, Components, & File-based Navigation
-- [x] **05:** [Light & Dark Modes](https://github.com/aqibmunir8/React-Native/tree/video-5-light-and-dark-theme)
-- [x] **06:** [Themed UI Components](https://github.com/aqibmunir8/React-Native/tree/video-6-Themed-UI-Components)
-- [x] **07:** [Route Groups & Nested Layouts](https://github.com/aqibmunir8/React-Native/tree/video-7-route-groups-and-nested-layouts)
-- [x] **08:** [Pressable Component](https://github.com/aqibmunir8/React-Native/tree/video-8-Pressable-Component)
-- [x] **09:** [Tabs Navigation](https://github.com/aqibmunir8/React-Native/tree/video-9-Tabs-Navigation)
+**File Path:** `./contexts/UserContext.jsx`
 
-- [x] **10:** [Tab Bar Icons](https://github.com/aqibmunir8/React-Native/tree/video-10-Tabs-Bar-Icons)
-- [x] **11:** [Safe Area View](https://github.com/aqibmunir8/React-Native/tree/video-11-Safe-Area-View)
+```javascript
+// ... inside UserProvider
+async function logout() {
+  try {
+    // 1. Delete the current active session from Appwrite
+    await account.deleteSession("current");
 
-### Authentication (Appwrite)
+    // 2. Clear the local global state
+    setUser(null);
+  } catch (error) {
+    console.log("Logout Error:", error.message);
+    throw error;
+  }
+}
 
-##### Backend Setup & Auth Forms
-
-- [x] **12** [Backend Setup](https://github.com/aqibmunir8/React-Native/tree/video-12-Backend-setup-with-AppWrite)
-
-- [x] **13** [Login and Signup Forms](https://github.com/aqibmunir8/React-Native/tree/video-13-Login-and-Signup-Forms)
-
-- [ ] **14** Making an Auth Context
-- [ ] **15** Logging Users In
-- [ ] **16** Showing Error Messages
-- [ ] **17** Logging Users Out
-- [ ] **18** Initial Auth State
-- [ ] **19** Protecting Routes
-- [ ] **20** Activity Indicators
-
-### Database & Real-time Data
-
-- [ ] **21** Database Setup
-- [ ] **22:** Books Context
-- [ ] **23** Creating New Records
-- [ ] **24** Fetching Book Records
-- [ ] **25** Using the FlatList Component
-- [ ] **26** Real-Time Data
-- [ ] **27** Dynamic Routes
-- [ ] **28** Fetching Single Records
-- [ ] **29** Deleting Books
+// Ensure logout is included in the Provider value
+return (
+  <UserContext.Provider value={{ user, login, logout, register }}>
+    {children}
+  </UserContext.Provider>
+);
+```
 
 ---
 
-## 🛠️ Built With
+### 2. Triggering Logout from the UI
 
-- **Framework:** [Expo](https://expo.dev/) / React Native
-- **Routing:** Expo Router (File-based)
-- **Icons:** Lucide React Native / FontAwesome
-- **Backend:** Appwrite (Planned)
+We typically place the logout button on a settings or profile page. By using the `useUser` hook, we can access the logout function directly.
 
-## ✍️ Personal Notes
+**File Path:** `./app/(dashboard)/profile.jsx`
 
-I am documenting my technical notes for each video using **Notion**. Detailed code snippets and implementation logic can be found in the README of each specific branch.
+- **Import Hook:** Bring in `useUser` to access global actions.
+- **Component Usage:** Use the `ThemedButton` to trigger the logout action.
+
+```javascript
+import { StyleSheet, Text } from "react-native";
+import { useUser } from "../../hooks/useUser";
+import ThemedView from "../../components/ThemedView";
+import ThemedText from "../../components/ThemedText";
+import ThemedButton from "../../components/ThemedButton";
+
+const Profile = () => {
+  const { logout } = useUser(); // Grab logout from context
+
+  return (
+    <ThemedView style={styles.container}>
+      <ThmedText title={true}>Your Profile</ThemedText>
+
+      <ThemedButton onPress={logout}>
+        <Text style={{ color: "#F2F2F2" }}>Log Out</Text>
+      </ThemedButton>
+    </ThemedView>
+  );
+};
+
+export default Profile;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});
+```
 
 ---
 
-_Created by [aqibmunir8](https://github.com/aqibmunir8)_
+### 3. The Session Lifecycle
+
+It is important to understand that Appwrite considers a user "active" as long as a session exists.
+
+- **Login/Register:** Creates a session.
+- **Logout:** Deletes the session ("current").
+- **Conflict:** If you try to log in while a session is already active, Appwrite throws an error: _"Creation of a session is prohibited when a session is active."_ This is why the logout function is a mechanical necessity for testing multiple accounts.
 
 ---
+
+### 4. Verification Strategy
+
+Since we don't have a "Protected Route" system yet (redirecting to login automatically), you can verify the logout worked by:
+
+- **The State Check:** Log `user` in your layout. It should turn to `null` after clicking logout.
+- **The "Register Test":** If you can register a new user without getting a "session active" error, the logout was successful.
+- **Appwrite Console:** Check the "Sessions" tab for a user in the Appwrite dashboard; the active session should disappear.
+
+---
+
+### Key Takeaways
+
+- **`deleteSession("current")`**: This specifically targets the session on the device the user is currently using.
+- **State Synchronization:** Always update your `setUser(null)` state after the API call succeeds to keep the UI in sync with the backend.
+- **Button Setup:** Pass the function reference (`onPress={logout}`) rather than invoking it immediately (`onPress={logout()}`).
+
+---
+
+![Alt Text](image/image1.png)
+When you press LOGOUT You will get log-out.
+
+Now you can Try to login it won’t show you this error:
+
+![Alt Text](image/image3.jpg)
+Now it got login again after log-out.
+
+![Alt Text](image/image2.jpg)
