@@ -1,76 +1,134 @@
-# React Native Learning Journey 📱
-
-This repository tracks my progress through the **Net Ninja React Native** series. I am building "Shelfie," a book-tracking application, while mastering Expo Router, custom theming, and backend integration.
-
-## 🚀 Navigation through this Repo
-
-To see the specific code, notes, and screenshots for any lesson, switch to the corresponding branch using the GitHub branch selector.
-
-| Section      | Milestone                     | Status       |
-| :----------- | :---------------------------- | :----------- |
-| **Basics**   | Navigation, Theming & Layouts | ✅ Completed |
-| **Auth**     | Appwrite Auth & Context       | ⏳ Progress  |
-| **Database** | CRUD Operations & Real-time   | ⏳ Upcoming  |
+These notes cover the implementation of **Route Guards**—a pattern used to protect specific screens from unauthorized access. By creating two reusable wrapper components, `<UserOnly>` and `<GuestOnly>`, you can control exactly who sees what.
 
 ---
 
-## 📚 Curriculum Roadmap
+## **1. Protecting Routes with `<UserOnly>`**
 
-### Native Basics
+This component ensures that only logged-in users can see its children. If a user is not logged in, they are redirected to the login page.
 
-- [x] **01-04:** Introduction, Components, & File-based Navigation
-- [x] **05:** [Light & Dark Modes](https://github.com/aqibmunir8/React-Native/tree/video-5-light-and-dark-theme)
-- [x] **06:** [Themed UI Components](https://github.com/aqibmunir8/React-Native/tree/video-6-Themed-UI-Components)
-- [x] **07:** [Route Groups & Nested Layouts](https://github.com/aqibmunir8/React-Native/tree/video-7-route-groups-and-nested-layouts)
-- [x] **08:** [Pressable Component](https://github.com/aqibmunir8/React-Native/tree/video-8-Pressable-Component)
-- [x] **09:** [Tabs Navigation](https://github.com/aqibmunir8/React-Native/tree/video-9-Tabs-Navigation)
+**File Path:** `./components/auth/UserOnly.jsx`
 
-- [x] **10:** [Tab Bar Icons](https://github.com/aqibmunir8/React-Native/tree/video-10-Tabs-Bar-Icons)
-- [x] **11:** [Safe Area View](https://github.com/aqibmunir8/React-Native/tree/video-11-Safe-Area-View)
+- **`useRouter`**: Used to perform the redirection.
+- **`replace`**: Unlike `push`, this replaces the current history entry so the user can't click "back" to a protected page after being kicked out.
+- **Logic**: We only redirect if `authChecked` is **true** and `user` is **null**.
 
-### Authentication (Appwrite)
+```jsx
+import { useEffect } from "react";
+import { Text } from "react-native";
+import { useRouter } from "expo-router";
+import { useUser } from "../../hooks/useUser";
 
-##### Backend Setup & Auth Forms
+const UserOnly = ({ children }) => {
+  const { user, authChecked } = useUser();
+  const router = useRouter();
 
-- [x] **12** [Backend Setup](https://github.com/aqibmunir8/React-Native/tree/video-12-Backend-setup-with-AppWrite)
+  useEffect(() => {
+    // If we've finished the check and there is no user, redirect to login
+    if (authChecked && user === null) {
+      router.replace("/login");
+    }
+  }, [user, authChecked]);
 
-- [x] **13** [Login and Signup Forms](https://github.com/aqibmunir8/React-Native/tree/video-13-Login-and-Signup-Forms)
+  // Show a loading state while checking OR if user is null (preventing flicker)
+  if (!authChecked || !user) {
+    return <Text>Loading...</Text>;
+  }
 
-- [ ] **14** Making an Auth Context
-- [ ] **15** Logging Users In
-- [ ] **16** Showing Error Messages
-- [ ] **17** Logging Users Out
-- [ ] **18** Initial Auth State
-- [ ] **19** Protecting Routes
-- [ ] **20** Activity Indicators
+  return children;
+};
 
-### Database & Real-time Data
-
-- [ ] **21** Database Setup
-- [ ] **22:** Books Context
-- [ ] **23** Creating New Records
-- [ ] **24** Fetching Book Records
-- [ ] **25** Using the FlatList Component
-- [ ] **26** Real-Time Data
-- [ ] **27** Dynamic Routes
-- [ ] **28** Fetching Single Records
-- [ ] **29** Deleting Books
+export default UserOnly;
+```
 
 ---
 
-## 🛠️ Built With
+## **2. Restricting Routes with `<GuestOnly>`**
 
-- **Framework:** [Expo](https://expo.dev/) / React Native
-- **Routing:** Expo Router (File-based)
-- **Icons:** Lucide React Native / FontAwesome
-- **Backend:** Appwrite (Planned)
+This is the opposite logic. If a user is **already logged in**, they shouldn't be able to see the Login or Register pages.
 
-## ✍️ Personal Notes
+**File Path:** `./components/auth/GuestOnly.jsx`
 
-I am documenting my technical notes for each video using **Notion**. Detailed code snippets and implementation logic can be found in the README of each specific branch.
+```jsx
+const GuestOnly = ({ children }) => {
+  const { user, authChecked } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    // If there IS a user, send them to the dashboard/profile
+    if (authChecked && user) {
+      router.replace("/profile");
+    }
+  }, [user, authChecked]);
+
+  // Hide the Login/Register form while the check is happening or if user is found
+  if (!authChecked || user) {
+    return <Text>Loading...</Text>;
+  }
+
+  return children;
+};
+```
 
 ---
 
-_Created by [aqibmunir8](https://github.com/aqibmunir8)_
+## **3. Applying Guards to Layouts**
+
+Instead of wrapping every single screen, you wrap the **Layout** files of your route groups. This automatically protects every page within that group.
+
+### **Protecting the Dashboard**
+
+**File Path:** `./app/(dashboard)/_layout.jsx`
+
+```jsx
+import UserOnly from "../../components/auth/UserOnly";
+import { Tabs } from "expo-router";
+
+export default function DashboardLayout() {
+  return (
+    <UserOnly>
+      <Tabs screenOptions={{ headerShown: false }}>{/* Tab screens... */}</Tabs>
+    </UserOnly>
+  );
+}
+```
+
+### **Restricting the Auth Group**
+
+**File Path:** `./app/(auth)/_layout.jsx`
+
+```jsx
+import GuestOnly from "../../components/auth/GuestOnly";
+import { Stack } from "expo-router";
+
+export default function AuthLayout() {
+  return (
+    <GuestOnly>
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* Login/Register screens... */}
+      </Stack>
+    </GuestOnly>
+  );
+}
+```
 
 ---
+
+## **4. The "Loading" Screen Fix**
+
+When the app first opens, `user` is null. Without the `authChecked` flag and the `if` checks, the app would redirect a logged-in user to the Login page for a split second before the Appwrite session is confirmed.
+
+- **`authChecked == false`**: We show a "Loading" placeholder.
+- **`authChecked == true`**: We know for certain if the user is a guest or authenticated.
+
+---
+
+## **5. Logic Comparison**
+
+| Component         | Target Group      | Redirect Trigger           | Target Destination |
+| ----------------- | ----------------- | -------------------------- | ------------------ |
+| **`<UserOnly>`**  | Logged-in Users   | `!user` (No session found) | `/login`           |
+| **`<GuestOnly>`** | Logged-out Guests | `user` (Session exists)    | `/profile`         |
+
+### **Key Takeaway**
+
+By using `router.replace()`, you create a much cleaner UX. If a user logs out while on the Profile page, the `useEffect` in `<UserOnly>` detects the `user` state changing to `null` and instantly boots them back to the login screen.
