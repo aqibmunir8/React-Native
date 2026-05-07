@@ -1,76 +1,115 @@
-# React Native Learning Journey 📱
+# 14. Registration and Login with Appwrite
 
-This repository tracks my progress through the **Net Ninja React Native** series. I am building "Shelfie," a book-tracking application, while mastering Expo Router, custom theming, and backend integration.
-
-## 🚀 Navigation through this Repo
-
-To see the specific code, notes, and screenshots for any lesson, switch to the corresponding branch using the GitHub branch selector.
-
-| Section      | Milestone                     | Status       |
-| :----------- | :---------------------------- | :----------- |
-| **Basics**   | Navigation, Theming & Layouts | ✅ Completed |
-| **Auth**     | Appwrite Auth & Context       | ⏳ Progress  |
-| **Database** | CRUD Operations & Real-time   | ⏳ Upcoming  |
+With the global context and the **Appwrite SDK** ready, we can now implement the actual logic to create accounts and manage user sessions.
 
 ---
 
-## 📚 Curriculum Roadmap
+## 1. The Registration Flow
 
-### Native Basics
+In Appwrite, "creating an account" and "logging in" are two separate steps. When a user registers, you create the account first, then manually trigger a login to create a session.
 
-- [x] **01-04:** Introduction, Components, & File-based Navigation
-- [x] **05:** [Light & Dark Modes](https://github.com/aqibmunir8/React-Native/tree/video-5-light-and-dark-theme)
-- [x] **06:** [Themed UI Components](https://github.com/aqibmunir8/React-Native/tree/video-6-Themed-UI-Components)
-- [x] **07:** [Route Groups & Nested Layouts](https://github.com/aqibmunir8/React-Native/tree/video-7-route-groups-and-nested-layouts)
-- [x] **08:** [Pressable Component](https://github.com/aqibmunir8/React-Native/tree/video-8-Pressable-Component)
-- [x] **09:** [Tabs Navigation](https://github.com/aqibmunir8/React-Native/tree/video-9-Tabs-Navigation)
+**File:** `./context/userContext.jsx`
 
-- [x] **10:** [Tab Bar Icons](https://github.com/aqibmunir8/React-Native/tree/video-10-Tabs-Bar-Icons)
-- [x] **11:** [Safe Area View](https://github.com/aqibmunir8/React-Native/tree/video-11-Safe-Area-View)
+- **`ID.unique()`**: A utility from the Appwrite SDK that generates a unique string for the user's ID.
+- **`account.create()`**: Sends the registration request to the backend.
 
-### Authentication (Appwrite)
+```javascript
+import { ID } from "react-native-appwrite";
+import { account } from "../lib/appwrite";
 
-##### Backend Setup & Auth Forms
+const register = async (email, password) => {
+  try {
+    // 1. Create the user account
+    await account.create(ID.unique(), email, password);
 
-- [x] **12** [Backend Setup](https://github.com/aqibmunir8/React-Native/tree/video-12-Backend-setup-with-AppWrite)
-
-- [x] **13** [Login and Signup Forms](https://github.com/aqibmunir8/React-Native/tree/video-13-Login-and-Signup-Forms)
-
-- [ ] **14** Making an Auth Context
-- [ ] **15** Logging Users In
-- [ ] **16** Showing Error Messages
-- [ ] **17** Logging Users Out
-- [ ] **18** Initial Auth State
-- [ ] **19** Protecting Routes
-- [ ] **20** Activity Indicators
-
-### Database & Real-time Data
-
-- [ ] **21** Database Setup
-- [ ] **22:** Books Context
-- [ ] **23** Creating New Records
-- [ ] **24** Fetching Book Records
-- [ ] **25** Using the FlatList Component
-- [ ] **26** Real-Time Data
-- [ ] **27** Dynamic Routes
-- [ ] **28** Fetching Single Records
-- [ ] **29** Deleting Books
+    // 2. Log them in immediately after registration
+    await login(email, password);
+  } catch (error) {
+    console.log("Registration Error:", error.message);
+    throw error;
+  }
+};
+```
 
 ---
 
-## 🛠️ Built With
+## 2. The Login Flow
 
-- **Framework:** [Expo](https://expo.dev/) / React Native
-- **Routing:** Expo Router (File-based)
-- **Icons:** Lucide React Native / FontAwesome
-- **Backend:** Appwrite (Planned)
+To log a user in, we create a **"Session."** Once the session is created, we use `account.get()` to retrieve the full user object (containing their ID, email, etc.) and store it in our global state.
 
-## ✍️ Personal Notes
+**File:** `./context/userContext.jsx`
 
-I am documenting my technical notes for each video using **Notion**. Detailed code snippets and implementation logic can be found in the README of each specific branch.
+- **`createEmailPasswordSession`**: The specific method to authenticate via email/password.
+- **`account.get()`**: Fetches the currently authenticated user's details.
+
+```javascript
+const login = async (email, password) => {
+  try {
+    // 1. Create the session (logs the user in on the server)
+    await account.createEmailPasswordSession(email, password);
+
+    // 2. Get user details and update global state
+    const response = await account.get();
+    setUser(response);
+  } catch (error) {
+    console.log("Login Error:", error.message);
+    throw error;
+  }
+};
+```
 
 ---
 
-_Created by [aqibmunir8](https://github.com/aqibmunir8)_
+## 3. Triggering from the UI
+
+In your `login.jsx` or `register.jsx` pages, you use the `useUser` hook to call these functions. It is best practice to wrap these calls in a `try...catch` block to handle potential issues (like a password being too short or an email already existing).
+
+**Example in `register.jsx`:**
+
+```javascript
+const { register } = useUser();
+
+const handleSubmit = async () => {
+  try {
+    await register(email, password);
+    // Success! The global 'user' state is now updated.
+  } catch (err) {
+    // Handle error (e.g., show an alert to the user)
+    alert(err.message);
+  }
+};
+```
 
 ---
+
+## 4. Verifying the User State
+
+Once the user is logged in, the user object in your context will change from `null` to a data-rich object. You can verify this by logging the user in any layout or page:
+
+```javascript
+const { user } = useUser();
+console.log("Logged in user:", user?.email); // Should show the user's email address
+```
+
+---
+
+## 💡 Key Takeaways
+
+- **Session Persistence:** Appwrite handles the heavy lifting of keeping the user logged in even if the app is closed and reopened.
+- **Explicit Login:** Always remember that `account.create` only makes the record; you must call `createEmailPasswordSession` to actually start a user session.
+- **Error Handling:** Appwrite returns helpful error messages (e.g., "Invalid credentials"). Passing these back to the UI helps users understand what went wrong.
+
+### Method Summary
+
+| Method                               | Purpose                                        | Source                  |
+| :----------------------------------- | :--------------------------------------------- | :---------------------- |
+| `ID.unique()`                        | Generates a random unique ID for new users.    | `react-native-appwrite` |
+| `account.create`                     | Adds a new user record to the backend.         | `lib/appwrite.js`       |
+| `account.createEmailPasswordSession` | Authenticates a user and starts a session.     | `lib/appwrite.js`       |
+| `account.get()`                      | Returns data for the currently logged-in user. | `lib/appwrite.js`       |
+
+---
+
+![Alt Text](images/image2.png)
+![Alt Text](images/image3.png)
+![Alt Text](images/image1.png)
