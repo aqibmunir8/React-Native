@@ -18,7 +18,10 @@ To see the specific code, notes, and screenshots for any lesson, switch to the c
 
 ### Native Basics
 
-- [x] **01-04:** Introduction, Components, & File-based Navigation
+- [x] **01:** [Introduction & Setup](https://github.com/aqibmunir8/React-Native/tree/video-1-Intro-Setup)
+- [x] **02:** [Text, View & Image Components](https://github.com/aqibmunir8/React-Native/tree/video-2-Text-View-Image)
+- [x] **03:** [File-Based Navigation](https://github.com/aqibmunir8/React-Native/tree/video-3-File-Based-Navigation)
+- [x] **04:** [Layouts and Stack Navigation](https://github.com/aqibmunir8/React-Native/tree/video-4-Layouts-Stack)
 - [x] **05:** [Light & Dark Modes](https://github.com/aqibmunir8/React-Native/tree/video-5-light-and-dark-theme)
 - [x] **06:** [Themed UI Components](https://github.com/aqibmunir8/React-Native/tree/video-6-Themed-UI-Components)
 - [x] **07:** [Route Groups & Nested Layouts](https://github.com/aqibmunir8/React-Native/tree/video-7-route-groups-and-nested-layouts)
