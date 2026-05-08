@@ -5,6 +5,10 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "scheme": "newapp",
+    "experiments": {
+      "typedRoutes": true
+    },
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
